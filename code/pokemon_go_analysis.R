@@ -5,6 +5,8 @@ df <- read_sheet("https://docs.google.com/spreadsheets/d/1EWzGk_qDK8ommXYz2jxYvF
 library(ggplot2)
 theme_set(theme_classic())
 
+df$cp_lambda <- log(df$final_cp) - log(df$starting_cp)
+
 ggplot(df, aes(x = cost_evolve, y = cp_lambda, colour = factor(number_evolutions))) +
   geom_point() +
   geom_smooth(method = "lm")
