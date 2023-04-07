@@ -38,3 +38,13 @@ summary(m2)
 
 library(ggeffects)
 plot(ggpredict(m2))
+
+
+
+
+m3 <- lm(cp_diff ~ type, data = df)
+
+summary(m3)
+
+library(ggeffects)
+plot(ggpredict(m3))
