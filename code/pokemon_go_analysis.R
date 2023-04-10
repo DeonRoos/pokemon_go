@@ -18,11 +18,10 @@ df <- read_sheet("https://docs.google.com/spreadsheets/d/1EWzGk_qDK8ommXYz2jxYvF
 # Treat following as factors
 df$player <- factor(df$player)
 df$num_evo <- factor(df$number_evolutions) # Could be treated as number
-df$patch <- factor(df$new)
+df$patch <- factor(df$patch)
 df$pokemon <- factor(df$pokemon)
 df$type <- factor(df$type)
 df$type_2 <- factor(df$type_2)
-df$patch <- factor(df$patch)
 # Log difference growth rate in cp
 df$cp_lambda <- log(df$final_cp) - log(df$starting_cp)
 # Changing text shorthand for full word
@@ -148,7 +147,7 @@ ggplot(df, aes(y = final_cp,
 
 ## vs patch
 ### Note that the exact versions are unknown for older data
-ggplot(df, aes(y = starting_cp,
+ggplot(df, aes(y = final_cp,
                x = patch)) +
   geom_boxplot() +
   geom_jitter(height = 0, width = 0.1, alpha = 0.3) +
@@ -157,8 +156,9 @@ ggplot(df, aes(y = starting_cp,
 
 ## vs starting CP, type and type2
 ggplot(df, aes(y = final_cp,
-               x = starting_cp)) +
-  geom_jitter(height = 0, width = 5, alpha = 0.3) +
+               x = starting_cp,
+               colour = num_evo)) +
+  geom_point(alpha = 0.3) +
   facet_grid(type_2 ~ type) +
   labs(y = "Final CP",
        x = "Starting CP") +
@@ -174,8 +174,8 @@ ggplot(df, aes(y = final_cp,
 # With k = X controlling how "wiggly" relationship can be (higher k = more wiggly)
 # s(bs = "re") allows for the relationships to vary between pokemon, but only the
 # variation that pokemon causes (only variation, not mean)
-m1 <- gam(final_cp ~ s(starting_cp, k = 5) + 
-            num_evo * evolve_stone + 
+m1 <- gam(final_cp ~ s(starting_cp, by = num_evo, k = 3) + 
+            evolve_stone + 
             s(cost_evolve, k = 5) + 
             s(player_level, k = 5) +
             s(pokemon, bs = "re"), 
@@ -188,11 +188,20 @@ summary(m1)
 # Plot the predictions from the model
 # Red dots = raw data
 plot(ggpredict(m1), add.data = TRUE)
+plot(m1, 
+     seWithMean = TRUE, 
+     shift = coef(m1)[1], 
+     shade = TRUE,
+     shade.col = "lightblue",
+     residuals = TRUE,
+     pch = 16, 
+     cex = 0.2,
+     pages = 1)
 
 # What determines the difference in CP from start to final CP? -----------------
 
-m2 <- gam(cp_diff ~ s(starting_cp, k = 5) + 
-            num_evo * evolve_stone + 
+m2 <- gam(cp_diff ~ s(starting_cp, by = num_evo, k = 3) + 
+            evolve_stone + 
             s(cost_evolve, k = 5) + 
             s(player_level, k = 5) +
             s(pokemon, bs = "re"), 
@@ -200,6 +209,15 @@ m2 <- gam(cp_diff ~ s(starting_cp, k = 5) +
 
 summary(m2)
 plot(ggpredict(m2), add.data = TRUE)
+plot(m2, 
+     seWithMean = TRUE, 
+     shift = coef(m1)[1], 
+     shade = TRUE,
+     shade.col = "lightblue",
+     residuals = TRUE,
+     pch = 16, 
+     cex = 0.2,
+     pages = 1)
 
 # How does type influence difference in CP? ------------------------------------
 
