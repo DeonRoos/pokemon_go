@@ -1,7 +1,16 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
 # Authors: Ross Kwok & Deon Roos
 # Purpose: Analysis of pokemon go evolutions to try and understand how CP is dictated
+## E.g. What is the code/equation that devs use to determine CP after evolving
+## Data entry is much faster after devs added a "preview" of final CP for an evolution
+## Sample is of an individual pokemon
+## NB that a single pokemon can have multiple obs
+## E.g. if purified can have pre- post purification CP levels
+## E.g. if starting CP is boosted
 # Ongoing work - just for fun in personal time.
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 # Packages: --------------------------------------------------------------------
 library(googlesheets4) # For loading in the data from google sheets
@@ -103,13 +112,21 @@ ggplot(df, aes(x = final_cp)) +
 
 ## vs starting CP
 ggplot(df, aes(y = final_cp,
-               x = starting_cp)) +
+               x = starting_cp,
+               fill = cost_evolve)) +
   geom_abline(intercept = 0, slope = 2, 
               linetype = 2, linewidth = 1) +
-  geom_jitter(height = 0, width = 5, alpha = 0.3) +
+  geom_jitter(pch = 21, colour = "black", alpha = 0.3,
+              size = 2, height = 0, width = 5) +
+  scale_fill_viridis_c(option = "C", direction = -1) +
+  coord_fixed() +
   labs(y = "Final CP",
        x = "Starting CP",
+       fill = "Cost to\nevolve",
        caption = "Dashed line shows a 1:2 return\n(e.g. 100 starting cp to 200 final cp)")
+
+# Little test model to see how close abline is to estimated fit of simple model
+coef(lm(final_cp ~ starting_cp, data = df))[2] # Ca. 1.5
 
 ## vs cost to evolve
 ggplot(df, aes(y = final_cp,
@@ -227,3 +244,33 @@ m3 <- lm(cp_diff ~ type,
 summary(m3)
 
 plot(ggpredict(m3), add.data = TRUE)
+
+# Simple model to check interaction --------------------------------------------
+
+m4 <- lm(final_cp ~ starting_cp : cost_evolve, 
+         data = df)
+
+summary(m4)
+
+nu_data <- expand.grid(
+  starting_cp = seq(from = min(df$starting_cp), to = max(df$starting_cp), length.out = 50),
+  cost_evolve = seq(from = min(df$cost_evolve), to = max(df$cost_evolve), length.out = 50)
+)
+
+nu_data$fit <- predict(m4, newdata = nu_data)
+
+df$resid <- df$final_cp - predict(m4)
+
+ggplot() +
+  geom_tile(data = nu_data, 
+            aes(x = starting_cp, y = cost_evolve, fill = fit)) +
+  geom_point(data = df, 
+             aes(x = starting_cp, y = cost_evolve, colour = resid, size = abs(resid))) +
+  scale_fill_viridis_c(option = "C") +
+  scale_colour_gradient2() +
+  scale_size(range = c(0.5, 3), limits = c(0, NA)) +
+  labs(x = "Starting CP",
+       y = "Cost to evolve",
+       fill = "Predicted\nfinal CP",
+       colour = "Difference in CP\nbetween final\nCP and prediction",
+       size = "Absolute residual")
