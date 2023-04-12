@@ -181,6 +181,89 @@ ggplot(df, aes(y = final_cp,
        x = "Starting CP") +
   theme_bw()
 
+### Post evolve CP -------------------------------------------------------------
+
+## As density plot/histogram
+ggplot(df, aes(x = cp_diff)) +
+  geom_density() +
+  geom_vline(xintercept = mean(df$cp_diff), 
+             linetype = 2) +
+  labs(x = "CP difference",
+       y = "Density",
+       caption = "Dashed line shows mean")
+
+## vs starting CP
+ggplot(df, aes(y = cp_diff,
+               x = starting_cp,
+               fill = cost_evolve)) +
+  geom_abline(intercept = 0, slope = coef(lm(cp_diff ~ starting_cp, data = df))[2], 
+              linetype = 2, linewidth = 1) +
+  geom_jitter(pch = 21, colour = "black", alpha = 0.3,
+              size = 2, height = 0, width = 5) +
+  scale_fill_viridis_c(option = "C", direction = -1) +
+  coord_fixed() +
+  labs(y = "CP difference",
+       x = "Starting CP",
+       fill = "Cost to\nevolve",
+       caption = "Dashed line shows slope estimate")
+
+# Little test model to see how close abline is to estimated fit of simple model
+ # Ca. 0.4
+
+## vs cost to evolve
+ggplot(df, aes(y = cp_diff,
+               x = cost_evolve)) +
+  geom_jitter(height = 0, width = 5, alpha = 0.3) +
+  labs(y = "CP difference",
+       x = "Cost to evolve")
+
+## vs player level
+ggplot(df, aes(y = cp_diff,
+               x = player_level)) +
+  geom_point(aes(colour = player), 
+             show.legend = TRUE) +
+  labs(y = "CP difference",
+       x = "Player level",
+       colour = "Player")
+
+## vs evolve stone
+ggplot(df, aes(y = cp_diff,
+               x = evolve_stone)) +
+  geom_boxplot() +
+  geom_jitter(height = 0, width = 0.1, alpha = 0.3) +
+  labs(y = "CP difference",
+       x = "Evolve stone required")
+
+## vs player level
+ggplot(df, aes(y = cp_diff,
+               x = reorder(pokemon, -cp_diff))) +
+  geom_boxplot() +
+  labs(y = "CP difference",
+       x = "Pokemon") +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1))
+
+## vs patch
+### Note that the exact versions are unknown for older data
+ggplot(df, aes(y = cp_diff,
+               x = patch)) +
+  geom_boxplot() +
+  geom_jitter(height = 0, width = 0.1, alpha = 0.3) +
+  labs(y = "CP difference",
+       x = "'Patch'")
+
+## vs starting CP, type and type2
+ggplot(df, aes(y = cp_diff,
+               x = starting_cp,
+               colour = num_evo)) +
+  geom_point(alpha = 0.3) +
+  facet_grid(type_2 ~ type) +
+  labs(y = "CP difference",
+       x = "Starting CP",
+       colour = "Number of\nevolutions") +
+  theme_bw()
+
 # Analysis: --------------------------------------------------------------------
 
 # What determines final CP? ----------------------------------------------------
@@ -222,13 +305,15 @@ m2 <- gam(cp_diff ~ s(starting_cp, by = num_evo, k = 3) +
             s(cost_evolve, k = 5) + 
             s(player_level, k = 5) +
             s(pokemon, bs = "re"), 
+          select = TRUE,
+          family = gaussian(link = "log"),
           data = df)
 
 summary(m2)
 plot(ggpredict(m2), add.data = TRUE)
 plot(m2, 
      seWithMean = TRUE, 
-     shift = coef(m1)[1], 
+     shift = coef(m2)[1], 
      shade = TRUE,
      shade.col = "lightblue",
      residuals = TRUE,
