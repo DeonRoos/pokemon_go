@@ -361,3 +361,9 @@ ggplot() +
        fill = "Predicted\nfinal CP",
        colour = "Difference in CP\nbetween final\nCP and prediction",
        size = "Absolute residual")
+
+
+Model to test if the final cp is influenced by the evolution cost
+
+m5 <- lm(final_cp ~ cost_evolve, data = df)
+Did not work however due to dataframe issue
