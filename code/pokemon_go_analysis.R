@@ -196,7 +196,9 @@ ggplot(df, aes(x = cp_diff)) +
 ggplot(df, aes(y = cp_diff,
                x = starting_cp,
                fill = cost_evolve)) +
-  geom_abline(intercept = 0, slope = coef(lm(cp_diff ~ starting_cp, data = df))[2], 
+  # geom_abline(intercept = coef(lm(cp_diff ~ starting_cp, data = df))[1], slope = coef(lm(cp_diff ~ starting_cp, data = df))[2], 
+  #             linetype = 2, linewidth = 1) +
+  geom_abline(intercept = 0, slope = 1, 
               linetype = 2, linewidth = 1) +
   geom_jitter(pch = 21, colour = "black", alpha = 0.3,
               size = 2, height = 0, width = 5) +
@@ -279,6 +281,7 @@ m1 <- gam(final_cp ~ s(starting_cp, by = num_evo, k = 3) +
             s(cost_evolve, k = 5) + 
             s(player_level, k = 5) +
             s(pokemon, bs = "re"), 
+          family = gaussian(link = "log"),
           data = df)
 
 # Model summary
@@ -306,7 +309,6 @@ m2 <- gam(cp_diff ~ s(starting_cp, by = num_evo, k = 3) +
             s(player_level, k = 5) +
             s(pokemon, bs = "re"), 
           select = TRUE,
-          family = gaussian(link = "log"),
           data = df)
 
 summary(m2)
