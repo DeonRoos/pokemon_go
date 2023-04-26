@@ -367,6 +367,14 @@ ggplot() +
 m5 <- lm(final_cp ~ cost_evolve, data = df)
 # Did not work however due to dataframe issue
 
-#fixed then issue, likely loadded the data incorrectly and re-added a few packages to fix the issue
+#fixed the issue, likely loaded the data incorrectly and re-added a few packages to fix the issue
+m5 <- lm(final_cp ~ cost_evolve, data = df)
 summmary (m5)
 plot(ggpredict(m5), add.data = TRUE)
+#worked like a treat
+
+#new model to test the relationship between primary type of the pokemon and the final cp after evolution
+
+m6 <- lm(final_cp ~ type, data = df)
+summary (m6)
+plot(ggpredict(m6), add.data = TRUE)
