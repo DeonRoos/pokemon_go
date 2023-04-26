@@ -368,8 +368,10 @@ m5 <- lm(final_cp ~ cost_evolve, data = df)
 # Did not work however due to dataframe issue
 
 #fixed the issue, likely loaded the data incorrectly and re-added a few packages to fix the issue
+# Deon - I was wondering if there was an issue with the googlesheets package and loading the data.
+# Deon - Glad it's sorted
 m5 <- lm(final_cp ~ cost_evolve, data = df)
-summmary (m5)
+summary (m5)
 plot(ggpredict(m5), add.data = TRUE)
 #worked like a treat
 
