@@ -20,8 +20,7 @@ library(mgcv)          # For non-linear models
 library(ggeffects)     # For quick model figures
 
 # Load the data from googlesheets (requires authorisation): --------------------
-df <- read_sheet("https://docs.google.com/spreadsheets/d/1EWzGk_qDK8ommXYz2jxYvFSSEzj9Wal976dWRwR4_0w/edit?usp=sharing",
-                 sheet = "Data", trim_ws = TRUE)
+df <- read_sheet("https://docs.google.com/spreadsheets/d/1EWzGk_qDK8ommXYz2jxYvFSSEzj9Wal976dWRwR4_0w/edit?usp=sharing", 24, sheet = "Data", trim_ws = TRUE)
 
 # Minor data tidy up: ----------------------------------------------------------
 # Treat following as factors
@@ -367,3 +366,15 @@ ggplot() +
 
 m5 <- lm(final_cp ~ cost_evolve, data = df)
 # Did not work however due to dataframe issue
+
+#fixed the issue, likely loaded the data incorrectly and re-added a few packages to fix the issue
+m5 <- lm(final_cp ~ cost_evolve, data = df)
+summmary (m5)
+plot(ggpredict(m5), add.data = TRUE)
+#worked like a treat
+
+#new model to test the relationship between primary type of the pokemon and the final cp after evolution
+
+m6 <- lm(final_cp ~ type, data = df)
+summary (m6)
+plot(ggpredict(m6), add.data = TRUE)
