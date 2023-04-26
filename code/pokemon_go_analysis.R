@@ -114,7 +114,7 @@ ggplot(df, aes(x = final_cp)) +
 ggplot(df, aes(y = final_cp,
                x = starting_cp,
                fill = cost_evolve)) +
-  geom_abline(intercept = 0, slope = 2, 
+  geom_abline(intercept = 7.5, slope = 2.2, 
               linetype = 2, linewidth = 1) +
   geom_jitter(pch = 21, colour = "black", alpha = 0.3,
               size = 2, height = 0, width = 5) +
@@ -126,7 +126,7 @@ ggplot(df, aes(y = final_cp,
        caption = "Dashed line shows a 1:2 return\n(e.g. 100 starting cp to 200 final cp)")
 
 # Little test model to see how close abline is to estimated fit of simple model
-coef(lm(final_cp ~ starting_cp, data = df))[2] # Ca. 1.5
+summary(lmer(final_cp ~ starting_cp + (1 + starting_cp | pokemon), data = df))
 
 ## vs cost to evolve
 ggplot(df, aes(y = final_cp,
@@ -198,7 +198,7 @@ ggplot(df, aes(y = cp_diff,
                fill = cost_evolve)) +
   # geom_abline(intercept = coef(lm(cp_diff ~ starting_cp, data = df))[1], slope = coef(lm(cp_diff ~ starting_cp, data = df))[2], 
   #             linetype = 2, linewidth = 1) +
-  geom_abline(intercept = 0, slope = 1, 
+  geom_abline(intercept = 7.5, slope = 1.2, 
               linetype = 2, linewidth = 1) +
   geom_jitter(pch = 21, colour = "black", alpha = 0.3,
               size = 2, height = 0, width = 5) +
@@ -210,7 +210,7 @@ ggplot(df, aes(y = cp_diff,
        caption = "Dashed line shows slope estimate")
 
 # Little test model to see how close abline is to estimated fit of simple model
- # Ca. 0.4
+summary(lmer(cp_diff ~ starting_cp + (1 + starting_cp | pokemon), data = df))
 
 ## vs cost to evolve
 ggplot(df, aes(y = cp_diff,
