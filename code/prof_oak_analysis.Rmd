@@ -1,0 +1,145 @@
+---
+title: "Professor Oak's thesis"
+author: "Deon Roos & Ross Kwok"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: monochrome
+    code_folding: hide
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+# Packages: --------------------------------------------------------------------
+library(googlesheets4) # For loading in the data from google sheets
+library(ggplot2)       # For data visualiations
+library(lme4)          # For mixed effect linear models
+library(mgcv)          # For non-linear models
+library(ggeffects)     # For quick model figures
+library(tidyverse)     # For data manipulation
+library(plotly)        # For interactive plots
+theme_set(theme_minimal())
+```
+
+# Pokemon Go analysis
+
+Just a document to mess around with some data and `.rmd` documents.
+
+```{r}
+# Load the data from googlesheets (requires authorisation): --------------------
+df <- read_sheet("https://docs.google.com/spreadsheets/d/1EWzGk_qDK8ommXYz2jxYvFSSEzj9Wal976dWRwR4_0w/edit?usp=sharing",
+                 #24, 
+                 sheet = "Data", 
+                 trim_ws = TRUE)
+
+# Minor data tidy up: ----------------------------------------------------------
+# Treat following as factors
+df$player <- factor(df$player)
+df$num_evo <- factor(df$number_evolutions) # Could be treated as number
+df$patch <- factor(df$patch)
+df$pokemon <- factor(df$pokemon)
+df$type <- factor(df$type)
+df$type_2 <- factor(df$type_2)
+# Log difference growth rate in cp
+df$cp_lambda <- log(df$final_cp) - log(df$starting_cp)
+# Changing text shorthand for full word
+df$evolve_stone <- factor(ifelse(df$evolve_stone == "y", "Yes", "No"))
+df$special <- factor(ifelse(df$special == "y", "Yes", "No"))
+```
+
+
+# Summary figures
+
+```{r}
+df2 <- df |> 
+  group_by(pokemon) |> 
+  summarise(pokemon_freq = n())
+ggplot(df2[df2$pokemon_freq > 10,], aes(x = reorder(pokemon, pokemon_freq), y = pokemon_freq)) +
+  geom_col() +
+  labs(x = "Pokemon",
+       y = "Number of data entries",
+       title = "Most common pokemon in the data") +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1))
+```
+
+```{r}
+df2 <- df |> 
+  group_by(pokemon) |> 
+  summarise(mean_start = mean(starting_cp))
+ggplot(df2[df2$mean_start > 1000,], aes(x = reorder(pokemon, mean_start), y = mean_start)) +
+  geom_point() +
+  labs(x = "Pokemon",
+       y = "Mean starting CP",
+       title = "Pokemon with highest average starting CP") +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1))
+```
+
+```{r}
+ggplot(df2[df2$mean_start < 300,], aes(x = reorder(pokemon, mean_start), y = mean_start)) +
+  geom_point() +
+  labs(x = "Pokemon",
+       y = "Mean starting CP",
+       title = "Pokemon with lowest average starting CP") +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1))
+```
+
+```{r}
+ggplotly(ggplot(df, aes(x = starting_cp, y = final_cp, colour = cp_diff, text = pokemon)) +
+           geom_point() +
+           labs(x = "Starting CP",
+                y = "Final CP",
+                colour = "Change in CP",
+                title = "Pokemon with lowest average starting CP") +
+           scale_colour_viridis_c(option = "C")
+)
+```
+
+```{r}
+ggplotly(ggplot(df, aes(x = starting_cp, y = final_cp, colour = cost_evolve, text = pokemon)) +
+           geom_point() +
+           labs(x = "Starting CP",
+                y = "Final CP",
+                colour = "Cost to evolve",
+                title = "Pokemon with lowest average starting CP") +
+           scale_colour_viridis_c(option = "C")
+)
+```
+
+```{r}
+ggplotly(ggplot(df, aes(x = starting_cp, y = final_cp, colour = player_level, text = pokemon)) +
+           geom_point() +
+           labs(x = "Starting CP",
+                y = "Final CP",
+                colour = "Player level",
+                title = "Pokemon with lowest average starting CP") +
+           scale_colour_viridis_c(option = "C")
+)
+```
+
+# Analysis
+
+Above figures suggest strong linear relationship between starting CP and final CP but with interacting effects of player level and cost to evolve. Will include random effects for pokemon (to account for varied effort and partially pool pokemon together), primary type, secondary type. Will need to be log-Normal model so that final CP is forced to be positive.
+
+```{r}
+m1 <- lmer(cp_diff ~ starting_cp * player_level * cost_evolve + 
+              (1 | pokemon),
+           data = df)
+summary(m1)
+plot(ggpredict(m1))
+```
+
