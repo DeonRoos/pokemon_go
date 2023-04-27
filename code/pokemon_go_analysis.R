@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-# Authors: Ross Kwok & Deon Roos
+# Authors: Ross Kwok & Deon Roos & Tom Price
 # Purpose: Analysis of pokemon go evolutions to try and understand how CP is dictated
 ## E.g. What is the code/equation that devs use to determine CP after evolving
 ## Data entry is much faster after devs added a "preview" of final CP for an evolution
