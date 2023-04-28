@@ -4,6 +4,13 @@ A repository for [Tom Price](https://twitter.com/thomasnprice), [Ross Kwok](http
 
 > This repository is purely used as a test bed for R, git, md, statistical analysis and related activities.
 
+## Repository guide
+
+* `code` folder contains:
+  + `pokemon_go_analysis.R` - An `R` script with visualisations and test analyses.
+  + `prof_oak_analysis.Rmd` - An `Rmd` (R markdown) script with interactive visualisations and more focussed analyses.
+  + `prof_oak_analysis.html` - The knit `Rmd` file to html.
+
 ## Data entry
 
 To enter data, please go to [this](https://docs.google.com/spreadsheets/d/1EWzGk_qDK8ommXYz2jxYvFSSEzj9Wal976dWRwR4_0w/edit?usp=sharing) Googlesheets document.
@@ -28,6 +35,17 @@ Data includes:
 
 With thanks to Sarah, Cristian and Alex for providing data.
 
-## Quick summary of data
+## Summary of data
 
 ![poke_summary](https://user-images.githubusercontent.com/107560653/235106670-8a20c31e-50c8-4daa-b0d8-d51e6b6fde74.png)
+
+## Package dependencies
+
+The various scripts within this repository make use of the following `R` packages (these should be installed and loaded to work on the various scripts):
+* `googlesheets4` - For loading in the data from googlesheets (requires googlesheets account)
+* `ggplot2` - For data visualiations
+* `lme4`- For mixed effect linear models
+* `mgcv` - For non-linear models
+* `ggeffects`- For quick model figures
+* `tidyverse`- For data manipulation
+* `plotly` - For interactive plots
