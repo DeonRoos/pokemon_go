@@ -63,8 +63,8 @@ df$special <- factor(ifelse(df$special == "y", "Yes", "No"))
 df2 <- df |> 
   group_by(pokemon) |> 
   summarise(pokemon_freq = n())
-ggplot(df2[df2$pokemon_freq > 10,], aes(x = reorder(pokemon, pokemon_freq), y = pokemon_freq)) +
-  geom_col() +
+ggplot(df2[df2$pokemon_freq > 10,], aes(x = reorder(pokemon, pokemon_freq), y = pokemon_freq, fill = pokemon)) +
+  geom_col(show.legend = FALSE) +
   labs(x = "Pokemon",
        y = "Number of data entries",
        title = "Most common pokemon in the data") +
@@ -104,7 +104,7 @@ ggplotly(ggplot(df, aes(x = starting_cp, y = final_cp, colour = cp_diff, text = 
            labs(x = "Starting CP",
                 y = "Final CP",
                 colour = "Change in CP",
-                title = "Pokemon with lowest average starting CP") +
+                title = "Change in pokemon CP after evolving") +
            scale_colour_viridis_c(option = "C")
 )
 ```
