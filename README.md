@@ -25,5 +25,3 @@ Data includes:
 * final_cp (CP of pokemon post evolution)
 * cp_diff (CP difference between evolution)
 * patch (Version of Pokemon Go [0 is "old" version from ca. 2019, 1 is "new" version from ca. 2023])
-
-[<img alt="alt_text" width="40px" src="images/image.PNG" />](https://www.google.com/)
