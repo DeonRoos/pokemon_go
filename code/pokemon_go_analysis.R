@@ -20,7 +20,8 @@ library(mgcv)          # For non-linear models
 library(ggeffects)     # For quick model figures
 
 # Load the data from googlesheets (requires authorisation): --------------------
-df <- read_sheet("https://docs.google.com/spreadsheets/d/1EWzGk_qDK8ommXYz2jxYvFSSEzj9Wal976dWRwR4_0w/edit?usp=sharing", 24, sheet = "Data", trim_ws = TRUE)
+df <- read_sheet("https://docs.google.com/spreadsheets/d/1EWzGk_qDK8ommXYz2jxYvFSSEzj9Wal976dWRwR4_0w/edit?usp=sharing", 
+                 sheet = "Data", trim_ws = TRUE)
 
 # Minor data tidy up: ----------------------------------------------------------
 # Treat following as factors

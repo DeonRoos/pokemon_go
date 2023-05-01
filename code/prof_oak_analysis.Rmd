@@ -136,10 +136,121 @@ ggplotly(ggplot(df, aes(x = starting_cp, y = final_cp, colour = player_level, te
 Above figures suggest strong linear relationship between starting CP and final CP but with interacting effects of player level and cost to evolve. Will include random effects for pokemon (to account for varied effort and partially pool pokemon together), primary type, secondary type. Will need to be log-Normal model so that final CP is forced to be positive.
 
 ```{r}
-m1 <- lmer(cp_diff ~ starting_cp * player_level * cost_evolve + 
-              (1 | pokemon),
+m1 <- lmer(final_cp ~ starting_cp * player_level * cost_evolve + 
+             (1 | pokemon),
            data = df)
 summary(m1)
 plot(ggpredict(m1))
+```
+
+```{r}
+nu_data <- expand.grid(
+  starting_cp = seq(from = min(df$starting_cp), to = max(df$starting_cp), length.out = 20),
+  player_level = seq(from = min(df$player_level), to = max(df$player_level), length.out = 20),
+  cost_evolve = seq(from = min(df$cost_evolve), to = max(df$cost_evolve), length.out = 20),
+  pokemon = "Charmander"
+)
+
+nu_data$pred <- predict(m1, nu_data)
+
+ind <- exclude.too.far(
+  nu_data$starting_cp, nu_data$player_level,
+  df$starting_cp, df$player_level, 
+  0.1)
+
+nu_data[ind,] <- NA
+
+ggplot() +
+  geom_tile(data = nu_data, aes(x = starting_cp, y = player_level, fill = pred)) +
+  scale_fill_viridis_c(option = "C") +
+    geom_point(data = df, aes(x = starting_cp, y = player_level),
+             size = 0.1, alpha = 0.2) +
+  labs(x = "Starting CP",
+       y = "Player level",
+       fill = "Predicted\nfinal CP")
+```
+
+```{r}
+nu_data <- expand.grid(
+  starting_cp = seq(from = min(df$starting_cp), to = max(df$starting_cp), length.out = 20),
+  player_level = seq(from = min(df$player_level), to = max(df$player_level), length.out = 20),
+  cost_evolve = seq(from = min(df$cost_evolve), to = max(df$cost_evolve), length.out = 20),
+  pokemon = "Charmander"
+)
+
+nu_data$pred <- predict(m1, nu_data)
+
+ind <- exclude.too.far(
+  nu_data$starting_cp, nu_data$cost_evolve,
+  df$starting_cp, df$cost_evolve, 
+  0.1)
+
+nu_data[ind,] <- NA
+
+ggplot() +
+  geom_tile(data = nu_data, aes(x = starting_cp, y = cost_evolve, fill = pred)) +
+  scale_fill_viridis_c(option = "C") +
+  geom_point(data = df, aes(x = starting_cp, y = cost_evolve),
+             size = 0.1, alpha = 0.2) +
+  labs(x = "Starting CP",
+       y = "Cost to evolve",
+       fill = "Predicted\nfinal CP")
+```
+
+```{r}
+nu_data <- expand.grid(
+  starting_cp = seq(from = min(df$starting_cp), to = max(df$starting_cp), length.out = 20),
+  player_level = seq(from = min(df$player_level), to = max(df$player_level), length.out = 20),
+  cost_evolve = seq(from = min(df$cost_evolve), to = max(df$cost_evolve), length.out = 20),
+  pokemon = "Charmander"
+)
+
+nu_data$pred <- predict(m1, nu_data)
+
+ind <- exclude.too.far(
+  nu_data$player_level, nu_data$cost_evolve,
+  df$player_level, df$cost_evolve, 
+  0.05)
+
+nu_data[ind,] <- NA
+
+ggplot() +
+  geom_tile(data = nu_data, aes(x = player_level, y = cost_evolve, fill = pred)) +
+  scale_fill_viridis_c(option = "C") +
+  geom_point(data = df, aes(x = player_level, y = cost_evolve),
+             size = 0.1, alpha = 0.2, colour = "black") +
+  labs(x = "Player level",
+       y = "Cost to evolve",
+       fill = "Predicted\nfinal CP")
+```
+
+```{r}
+nu_data <- expand.grid(
+  starting_cp = seq(from = min(df$starting_cp), to = max(df$starting_cp), length.out = 20),
+  player_level = seq(from = min(df$player_level), to = max(df$player_level), length.out = 20),
+  cost_evolve = c(25, 50, 100, 400),
+  pokemon = "Charmander"
+)
+
+nu_data$pred <- predict(m1, nu_data)
+
+ind <- exclude.too.far(
+  nu_data$player_level, nu_data$starting_cp,
+  df$player_level, df$starting_cp, 
+  0.04)
+
+nu_data[ind,] <- NA
+
+nu_data$cost_evolve <- factor(nu_data$cost_evolve)
+
+nu_data <- nu_data[complete.cases(nu_data),]
+
+ggplot() +
+  geom_tile(data = nu_data, aes(x = starting_cp, y = player_level, fill = pred)) +
+  scale_fill_viridis_c(option = "C") +
+  facet_wrap(~cost_evolve, scales = "free") +
+  labs(x = "Starting CP",
+       y = "Player level",
+       fill = "Predicted\nchange in CP")
 ```
 
