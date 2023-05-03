@@ -1,6 +1,6 @@
 ![Pokemon_Go](https://user-images.githubusercontent.com/107560653/235102831-6254b0e1-d5b6-4394-9b7e-eae4d81dc4be.png)
 
-A repository for [Tom Price](https://twitter.com/thomasnprice), [Ross Kwok](https://twitter.com/KwokRTK93) and [Deon Roos](https://twitter.com/DeonRoos88) to mess around with programming and statistics using data collected from Pokemon Go. The toy question loosely revolves around trying to determine the developer choices in a game whereby characters (pokemon) can be "evolved" to gain additional power. Clearly the developers included some rules (i.e. equations) to govern this process which is what, playfully, we are trying to understand.
+A repository for [Tom Price](https://twitter.com/thomasnprice), [Ross Kwok](https://twitter.com/KwokRTK93) and [Deon Roos](https://twitter.com/DeonRoos88) to mess around with programming and statistics using data collected from Pokemon Go. The toy question loosely revolves around trying to determine the developer choices in a game whereby pokemon can be evolved to gain additional power. Clearly the developers included some rules (i.e. equations) to govern this process which is what, playfully, we are trying to understand.
 
 > This repository is used purely as a test bed for R, git, md, statistical analysis and related activities.
 
